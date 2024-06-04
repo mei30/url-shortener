@@ -6,14 +6,14 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get(':shortUrl')
-  @Redirect('', 302)
-  longUrl(@Param('shortUrl') shortUrl: string) {
-    return {url : this.appService.longUrl(shortUrl)};
+  // @Redirect('', 302)
+  async longUrl(@Param('shortUrl') shortUrl: string) {
+    return {url : await this.appService.longUrl(shortUrl)};
   }
 
   @Post('data/shorten')
-  shorten(@Body('longUrl') longUrl: string) {
-    const url = this.appService.shorten(longUrl);
+  async shorten(@Body('longUrl') longUrl: string) {
+    const url = await this.appService.shorten(longUrl);
 
     return {url : url};
   }

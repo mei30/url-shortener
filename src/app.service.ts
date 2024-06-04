@@ -1,7 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-
-import  * as crc32  from 'crc-32'
-import { randomInt } from 'crypto';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
@@ -9,21 +7,22 @@ export class AppService {
   private chars: string
   private counter: number
 
-  constructor() {
+  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {
     this.urlMap = new Map<string, string>()
     this.chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     this.counter = 1
   }
 
-  shorten(realUrl: string): string {
-    if (this.urlMap.has(realUrl))
-      return this.urlMap.get(realUrl)
+  async shorten(realUrl: string): Promise<unknown> {
 
-    
-    // choose a algorithm for shortening url
+    const shortUrl = await this.cacheManager.get(realUrl)
+
+    console.log(shortUrl)
+
+    if (shortUrl != null)
+      return shortUrl
+
     let shortenUrl = ''
-
-    ++this.counter
 
     let copy_of_counter = this.counter
     while (copy_of_counter != 0)
@@ -34,16 +33,20 @@ export class AppService {
     }
 
 
-    this.urlMap.set(shortenUrl, realUrl)
-    this.urlMap.set(realUrl, shortenUrl)
+    await this.cacheManager.set(shortenUrl, realUrl, 0)
+    await this.cacheManager.set(realUrl, shortenUrl, 0)
+  
+    ++this.counter
 
     return shortenUrl.toString();
   }
 
-  longUrl(shortUrl: string): string {
-    if (!this.urlMap.has(shortUrl))
-      throw new NotFoundException(`The requested ${shortUrl} does not exist.`, )
-    
-    return this.urlMap.get(shortUrl)
+  async longUrl(shortUrl: string): Promise<unknown> {
+    const longURL = await this.cacheManager.get(shortUrl)
+
+    if (longURL == null)
+      throw new NotFoundException(`There is no entry for ${shortUrl}`)
+
+    return longURL
   }
 }
