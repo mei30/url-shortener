@@ -1,12 +1,20 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Redirect } from '@nestjs/common';
 import { AppService } from './app.service';
 
-@Controller()
+@Controller('api/v1/')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get(':shortUrl')
+  @Redirect('', 302)
+  longUrl(@Param('shortUrl') shortUrl: string) {
+    return {url : this.appService.longUrl(shortUrl)};
+  }
+
+  @Post('data/shorten')
+  shorten(@Body('longUrl') longUrl: string) {
+    const url = this.appService.shorten(longUrl);
+
+    return {url : url};
   }
 }
