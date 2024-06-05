@@ -13,9 +13,9 @@ export class AppService {
     this.counter = 1
   }
 
-  async shorten(realUrl: string): Promise<unknown> {
+  async shorten(realUrl: string): Promise<string> {
 
-    const shortUrl = await this.cacheManager.get(realUrl)
+    const shortUrl = await this.cacheManager.get<string>(realUrl)
 
     console.log(shortUrl)
 
@@ -41,8 +41,8 @@ export class AppService {
     return shortenUrl.toString();
   }
 
-  async longUrl(shortUrl: string): Promise<unknown> {
-    const longURL = await this.cacheManager.get(shortUrl)
+  async longUrl(shortUrl: string): Promise<string> {
+    const longURL = await this.cacheManager.get<string>(shortUrl)
 
     if (longURL == null)
       throw new NotFoundException(`There is no entry for ${shortUrl}`)

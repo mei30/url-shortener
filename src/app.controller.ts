@@ -6,7 +6,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get(':shortUrl')
-  // @Redirect('', 302)
+  @Redirect('', 302)
   async longUrl(@Param('shortUrl') shortUrl: string) {
     return {url : await this.appService.longUrl(shortUrl)};
   }
