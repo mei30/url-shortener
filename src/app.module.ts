@@ -8,7 +8,7 @@ import { CacheModule } from '@nestjs/cache-manager';
   imports: [CacheModule.register({
     isGlobal: true,
     store: redisStore,
-    host: 'localhost',
+    host: 'cache',
     port: 6379
   }
   )],

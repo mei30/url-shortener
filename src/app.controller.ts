@@ -5,6 +5,11 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Get('')
+  hello() {
+    return {message : "hello from url shortener service"};
+  }
+
   @Get(':shortUrl')
   @Redirect('', 302)
   async longUrl(@Param('shortUrl') shortUrl: string) {
